@@ -19,10 +19,6 @@ class GradServis
   {
     $this->broker->izvrsiIzmenu("insert into grad(naziv) values ('" . $grad['naziv'] . "')");
   }
-  public function izmeni($id, $grad)
-  {
-    $this->broker->izvrsiIzmenu("update grad set naziv='" . $grad['naziv'] . "' where id=" . $id);
-  }
 
   public function obrisi($id)
   {
