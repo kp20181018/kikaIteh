@@ -1,5 +1,5 @@
 <?php
-require './db/Broker.php';
+require '../db/Broker.php';
 class GradServis
 {
   private Broker $broker;
@@ -25,3 +25,4 @@ class GradServis
     $this->broker->izvrsiIzmenu("delete from grad where id=" . $id);
   }
 }
+$gradServis = new GradServis(new Broker());

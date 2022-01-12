@@ -1,5 +1,5 @@
 <?php
-require "./db/Broker.php";
+require "../db/Broker.php";
 
 class VremeServis
 {
@@ -15,3 +15,4 @@ class VremeServis
     return $this->broker->izvrsiCitanje("select * from vreme");
   }
 }
+$vremeServis = new VremeServis(new Broker());
