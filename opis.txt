@@ -1,0 +1,13 @@
+Aplikacija predstavlja veb sajt na kome se moze videti vremenska prognoza.
+U bazi su prepoznate 3 tabele:
+ - grad
+ - vreme (vedro, kisovito,..)
+ - prognoza - sadrzi prognozu za odredjeni dan za odredjeni grad
+ Aplikacija omogucava CRUD operacije nad tabelom prognoza i operacija kreiranja, pretrage i brisanja nad tabelom grad.
+ Tadodje, omoguceno je citanje iz tabele vreme.
+ Aplikacija je podeljena na sledece komponente:
+ - broker baze podataka - komunicira sa bazom i izvrsava upite
+ - servisi - svaki servis odnosi se na jednu tabelu u bazi i implementira odredjene operacije (kreiranje, izmena,...)
+ - api - predstavljaju dodirnu tacku izmedju klijenta i servera. Ovi fajlovi se pozivaju HTTP zahtevima
+	i pozivaju odgovarajucu servis klasu na osnovu url parametara i tela zahteva.
+ - UI - sadrzi html i javascript. Sluzi za iscrtavanje korisnickog interfejsa i pravljenje AJAX poziva ka serveru.
