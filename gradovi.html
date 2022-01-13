@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"></script>
+  <title>Gradovi</title>
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark sticky-top bg-primary">
+    <a class="navbar-brand" href="index.html">Vremenska prognoza </a>
+
+    <div class="navbar-collapse collapse">
+      <ul class="navbar-nav mx-auto">
+        <li class="nav-item mx-auto">
+          <a class="nav-link" href="index.html">Prognoza</a>
+        </li>
+        <li class="nav-item mx-auto">
+          <a class="nav-link" href="gradovi.html">Gradovi</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</body>
+<div class="container mt-5">
+  <h1 class="text-center">Spisak gradova</h1>
+  <div class="mt-4">
+    <input type="text" class="form-control" placeholder="Pretrazi gradove" id='pretraga'>
+  </div>
+  <div class="mt-5 row d-flex justify-content-center">
+    <div class="col-6">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Naziv</th>
+            <th>Postanski broj</th>
+            <th>Obrisi</th>
+          </tr>
+        </thead>
+        <tbody id='podaci'>
+
+        </tbody>
+      </table>
+    </div>
+    <div class="col-1"></div>
+    <div class="col-5">
+      <h2 class="text-center">
+        Kreiraj novi grad
+      </h2>
+      <form id='forma'>
+        <div class="form-group">
+          <label for="naziv" class="col-form-label">Naziv</label>
+          <input required class="form-control" id="naziv">
+        </div>
+        <div class="form-group">
+          <label for="postanski_broj" class="col-form-label">Postanski broj</label>
+          <input required class="form-control" id="postanski_broj">
+        </div>
+        <button class="btn btn-primary mt-2 form-control">Kreiraj</button>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+
+
+  $(document).ready(() => {
+    ucitajGradove();
+    $("#pretraga").change(ucitajGradove);
+    $('#forma').submit(e => {
+      e.preventDefault();
+
+      $.post('api/grad-create.php', {
+        naziv: $('#naziv').val(),
+        postanski_broj: $('#postanski_broj').val()
+      }).then(res => {
+        alert(res);
+        ucitajGradove();
+      })
+    })
+  })
+
+  function ucitajGradove() {
+    const pretraga = $('#pretraga').val() || '';
+    $.getJSON('api/grad-read.php?naziv=' + pretraga).then(res => {
+      $('#podaci').html('');
+      for (let grad of res) {
+        $('#podaci').append(`
+        <tr>
+          <td>${grad.id}</td>
+          <td>${grad.naziv}</td>
+          <td>${grad.postanski_broj}</td>
+          <td>
+            <button onClick="obrisiGrad(${grad.id})" class='btn btn-danger form-control'>Obrisi</button>
+          </td>
+        </tr>
+      `)
+      }
+    })
+  }
+
+  function obrisiGrad(id) {
+    const val = confirm('Da li ste sigurni');
+    if (!val) {
+      return;
+    }
+    $.post('api/grad-delete.php', { id }).then(res => {
+      alert(res);
+      ucitajGradove();
+    })
+  }
+
+</script>
+
+</html>

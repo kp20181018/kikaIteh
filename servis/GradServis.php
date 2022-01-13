@@ -10,14 +10,17 @@ class GradServis
     $this->broker = $broker;
   }
 
-  public function ucitaj()
+  public function ucitaj($naziv)
   {
-    return $this->broker->izvrsiCitanje("select * from grad");
+    if ($naziv == '') {
+      return $this->broker->izvrsiCitanje("select * from grad");
+    }
+    return $this->broker->izvrsiCitanje("select * from grad where naziv like '%" . $naziv . "%'");
   }
 
   public function kreiraj($grad)
   {
-    $this->broker->izvrsiIzmenu("insert into grad(naziv) values ('" . $grad['naziv'] . "')");
+    $this->broker->izvrsiIzmenu("insert into grad(naziv,postanski_broj) values ('" . $grad['naziv'] . "','" . $grad['postanski_broj'] . "')");
   }
 
   public function obrisi($id)

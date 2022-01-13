@@ -6,7 +6,7 @@ class Broker
   private $mysqli;
   public function __construct()
   {
-    $this->mysqli = new mysqli('localhost', 'root', '', 'vreme');
+    $this->mysqli = new mysqli('localhost', 'root', 'root', 'vreme');
     $this->mysqli->set_charset("utf8");
   }
 
