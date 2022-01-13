@@ -30,5 +30,175 @@
     </div>
   </nav>
 </body>
+<div class="m-5">
+  <div class="row">
+    <div class="col-11">
+      <h1 class="text-center">Prognoza</h1>
+    </div>
+    <div class="col-1">
+      <button data-toggle='modal' data-target='#exampleModal' class="btn btn-primary form-control">Kreiraj</button>
+    </div>
+  </div>
+
+  <table class="table mt-4">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Datum</th>
+        <th>Minimalna temperatura</th>
+        <th>Maksimalna temperatura</th>
+        <th>Vreme</th>
+        <th>Grad</th>
+        <th>Izmeni</th>
+        <th>Obrisi</th>
+      </tr>
+    </thead>
+    <tbody id='podaci'>
+
+    </tbody>
+  </table>
+</div>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Forma prognoza</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+
+        <form id="forma">
+          <div class="form-group">
+            <label for="datum" class="col-form-label">Datum</label>
+            <input required type="date" class="form-control" id="datum">
+          </div>
+          <div class="form-group">
+            <label for="minimum" class="col-form-label">Minimalna temperatura</label>
+            <input required type="number" class="form-control" id="minimum">
+          </div>
+          <div class="form-group">
+            <label for="maksimum" class="col-form-label">Maksimalna temperatura</label>
+            <input required type="number" class="form-control" id="maksimum">
+          </div>
+          <div class="form-group">
+            <label for="grad" class="col-form-label">Grad</label>
+            <select required class="form-control" id="grad"></select>
+          </div>
+          <div class="form-group">
+            <label for="vreme" class="col-form-label">Vreme</label>
+            <select required class="form-control" id="vreme"></select>
+          </div>
+          <button type="submit" class="btn btn-primary form-control">Sacuvaj</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let selId = 0;
+    $(document).ready(() => {
+      ucitajPrognoze();
+      ucitajVremena()
+      ucitajGradove();
+      $('#exampleModal').on('show.bs.modal', e => {
+        const button = $(e.relatedTarget);
+        selId = button.data('id') || 0;
+        if (!selId) {
+          return;
+        }
+        $('#datum').val(button.data('datum'))
+        $('#minimum').val(button.data('minimum'))
+        $('#maksimum').val(button.data('maksimum'))
+        $('#grad').val(button.data('grad'))
+        $('#vreme').val(button.data('vreme'))
+      })
+      $('#forma').submit(e => {
+        e.preventDefault();
+        const telo = {
+          datum: $('#datum').val(),
+          minimum: $('#minimum').val(),
+          maksimum: $('#maksimum').val(),
+          grad: $('#grad').val(),
+          vreme: $('#vreme').val()
+        }
+        let putanja = `api/prognoza-${selId > 0 ? 'update' : 'create'}.php`;
+        if (selId > 0) {
+          telo.id = selId;
+        }
+        $.post(putanja, telo).then(res => {
+          alert(res);
+          ucitajPrognoze();
+        })
+      })
+    })
+
+    function ucitajPrognoze() {
+      $.getJSON('api/prognoza-read.php?').then(res => {
+        $('#podaci').html('');
+        for (let prognoza of res) {
+          const datum = new Date(prognoza.datum);
+          const datumStr = datum.getDate() + '.' + (datum.getMonth() + 1) + "." + datum.getFullYear();
+          $('#podaci').append(`
+        <tr>
+          <td>${prognoza.id}</td>
+          <td>${datumStr}</td>
+          <td>${prognoza.minimum}</td>
+          <td>${prognoza.maksimum}</td>
+          <td>${prognoza.vreme_naziv}</td>
+          <td>${prognoza.grad_naziv}</td>
+          <td>
+            <button
+            data-toggle='modal'
+             data-target='#exampleModal'
+             data-id='${prognoza.id}'
+             data-datum='${prognoza.datum}'
+             data-minimum='${prognoza.minimum}'
+             data-maksimum='${prognoza.maksimum}'
+             data-vreme='${prognoza.vreme}'
+             data-grad='${prognoza.grad}'
+            class='btn btn-secondary form-control'>Izmeni</button>
+          </td>
+          <td>
+            <button onClick="obrisiPrognozu(${prognoza.id})" class='btn btn-danger form-control'>Obrisi</button>
+          </td>
+        </tr>
+      `)
+        }
+      })
+    }
+
+    function obrisiPrognozu(id) {
+      const val = confirm('Da li ste sigurni');
+      if (!val) {
+        return;
+      }
+      $.post('api/prognoza-delete.php', { id }).then(res => {
+        alert(res);
+        ucitajPrognoze();
+      })
+    }
+    function ucitajVremena() {
+      $.getJSON('api/vreme-read.php').then(res => {
+        for (let vreme of res) {
+          $("#vreme").append(`
+          <option value='${vreme.id}'>${vreme.naziv}</option>
+          `)
+        }
+      })
+    }
+    function ucitajGradove() {
+      $.getJSON('api/grad-read.php').then(res => {
+        for (let grad of res) {
+          $("#grad").append(`
+          <option value='${grad.id}'>${grad.naziv}</option>
+          `)
+        }
+      })
+    }
+  </script>
 
 </html>
